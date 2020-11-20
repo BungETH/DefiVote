@@ -46,6 +46,11 @@ contract('Voting', function (accounts) {
 
     it("Voter should register a proposal", async () => {
 
+        await VotingInstance.registerVoter(voter1, {from: admin});
+        await VotingInstance.registerVoter(voter2, {from: admin});
+        await VotingInstance.registerVoter(voter3, {from: admin});
+        await VotingInstance.startProposalRegistration({from: admin});
+
         nbProposals = await VotingInstance.proposalCounts();
 
         await VotingInstance.registerProposal('aaa', {from: voter1});
@@ -53,7 +58,6 @@ contract('Voting', function (accounts) {
         await VotingInstance.registerProposal('ccc', {from: voter3});
 
         expect(await VotingInstance.proposalCounts()).to.above(nbProposals);
-
     });
 });
 

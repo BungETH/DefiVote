@@ -1,0 +1,28 @@
+{
+  "name": "defivote",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@openzeppelin/test-helpers": "^0.5.9"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^3.2.0"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BungETH/DefiVote.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BungETH/DefiVote/issues"
+  },
+  "homepage": "https://github.com/BungETH/DefiVote#readme"
+}

@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract Voting is Ownable {
 
+    using Counters for Counters.Counter;
+
     enum WorkflowStatus {
         RegisteringVoters,
         ProposalsRegistrationStarted,
@@ -32,7 +34,7 @@ contract Voting is Ownable {
     
     mapping(uint => Proposal) public listProposals;
     
-    Counters.Counter private _proposalCounts;
+    Counters.Counter public proposalCounts;
 
     uint winningProposalId;
     
@@ -48,7 +50,7 @@ contract Voting is Ownable {
     event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus);
 
     function isVoter(address _address) public view onlyOwner returns(bool) {
-      return whiteList[_address].isRegistered;
+        return whiteList[_address].isRegistered;
     }
 
     function registerVoter(address _address) public onlyOwner {
@@ -70,5 +72,19 @@ contract Voting is Ownable {
 
         emit WorkflowStatusChange(oldState, workflowState);
         emit ProposalsRegistrationStarted();
+    }
+
+    function registerProposal(string memory _description) external {
+        require(workflowState == WorkflowStatus.ProposalsRegistrationStarted, "Error with the WorkflowStatus");
+        require(whiteList[msg.sender].isRegistered, "User is not registred has a voter !");
+
+        Proposal memory newProposal;
+        newProposal.description = _description;
+
+        proposalCounts.increment();
+
+        listProposals[proposalCounts.current()] = newProposal;
+
+        emit ProposalRegistered(proposalCounts.current());
     }
 }

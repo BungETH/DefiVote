@@ -7,6 +7,7 @@ contract('Voting', function (accounts) {
     const voter1 = accounts[1];
     const voter2 = accounts[2];
     const voter3 = accounts[3];
+    let VotingInstance;
 
     const status = {
         0 :'RegisteringVoters',
@@ -17,9 +18,12 @@ contract('Voting', function (accounts) {
         5 :'VotesTallied'
     };
 
+    beforeEach(async function () {
+        VotingInstance = await Voting.new({from: admin});
+    });
+
     it("Adminstrator should add a Voter to whitelist", async () => {
 
-        const VotingInstance = await Voting.new({from: admin});
         let isVoterBefore = await VotingInstance.isVoter(voter1, {from: admin});
         expect(isVoterBefore).to.equal(false);
 
@@ -31,8 +35,6 @@ contract('Voting', function (accounts) {
 
     it("Adminstrator should start proposal registration session", async () => {
 
-        const VotingInstance = await Voting.new({from: admin});
-
         let beforeStatus = await VotingInstance.workflowState();
         expect(status[beforeStatus]).to.equal('RegisteringVoters');
 
@@ -40,6 +42,18 @@ contract('Voting', function (accounts) {
 
         let afterStatus = await VotingInstance.workflowState();
         expect(status[afterStatus]).to.equal('ProposalsRegistrationStarted');
+    });
+
+    it("Voter should register a proposal", async () => {
+
+        nbProposals = await VotingInstance.proposalCounts();
+
+        await VotingInstance.registerProposal('aaa', {from: voter1});
+        await VotingInstance.registerProposal('bbb', {from: voter2});
+        await VotingInstance.registerProposal('ccc', {from: voter3});
+
+        expect(await VotingInstance.proposalCounts()).to.above(nbProposals);
+
     });
 });
 

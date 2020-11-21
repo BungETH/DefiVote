@@ -43,13 +43,17 @@ contract('Voting', function (accounts) {
         let afterStatus = await VotingInstance.workflowState();
         expect(status[afterStatus]).to.equal('ProposalsRegistrationStarted');
     });
-
+        
     it("Voter should register a proposal", async () => {
 
         await VotingInstance.registerVoter(voter1, {from: admin});
         await VotingInstance.registerVoter(voter2, {from: admin});
         await VotingInstance.registerVoter(voter3, {from: admin});
+
         await VotingInstance.startProposalRegistration({from: admin});
+
+        let afterStatus = await VotingInstance.workflowState();
+        expect(status[afterStatus]).to.equal('ProposalsRegistrationStarted');
 
         nbProposals = await VotingInstance.proposalCounts();
 
@@ -57,7 +61,7 @@ contract('Voting', function (accounts) {
         await VotingInstance.registerProposal('bbb', {from: voter2});
         await VotingInstance.registerProposal('ccc', {from: voter3});
 
-        expect(await VotingInstance.proposalCounts()).to.above(nbProposals);
+        expect(new BN(await VotingInstance.proposalCounts())).to.be.bignumber.above(new BN(nbProposals));
     });
+    
 });
-

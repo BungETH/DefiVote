@@ -16,7 +16,7 @@ contract Voting is Ownable {
         VotingSessionEnded,
         VotesTallied
     }
-    
+
     WorkflowStatus public workflowState;
 
     struct Voter {
@@ -24,20 +24,20 @@ contract Voting is Ownable {
         bool hasVoted;
         uint votedProposalId;
     }
-    
+
     mapping(address => Voter) public whiteList;
     
     struct Proposal {
         string description;
         uint voteCount;
     }
-    
+
     mapping(uint => Proposal) public listProposals;
-    
+
     Counters.Counter public proposalCounts;
 
     uint winningProposalId;
-    
+
     event VoterRegistered(address voterAddress);
     event ProposalsRegistrationStarted();
     event ProposalsRegistrationEnded();
@@ -46,7 +46,7 @@ contract Voting is Ownable {
     event VotingSessionEnded();
     event Voted (address voter, uint proposalId);
     event VotesTallied();
-    
+
     event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus);
 
     function isVoter(address _address) public view onlyOwner returns(bool) {
@@ -86,5 +86,73 @@ contract Voting is Ownable {
         listProposals[proposalCounts.current()] = newProposal;
 
         emit ProposalRegistered(proposalCounts.current());
+    }
+
+    function endProposalRegistration() external onlyOwner {
+        require(workflowState == WorkflowStatus.ProposalsRegistrationStarted, "Error with the WorkflowStatus");
+
+        WorkflowStatus oldState = workflowState;
+        workflowState = WorkflowStatus.ProposalsRegistrationEnded;
+
+        emit WorkflowStatusChange(oldState, workflowState);
+        emit ProposalsRegistrationEnded();
+    }
+
+    function VotingSessionStart() external onlyOwner {
+        require(workflowState == WorkflowStatus.ProposalsRegistrationEnded, "Error with the WorkflowStatus");
+
+        WorkflowStatus oldState = workflowState;
+        workflowState = WorkflowStatus.VotingSessionStarted;
+
+        emit WorkflowStatusChange(oldState, workflowState);
+        emit VotingSessionStarted();
+    }
+
+    function Vote(uint idProposal) external  {
+        require(workflowState == WorkflowStatus.VotingSessionStarted, "Error with the WorkflowStatus");
+        require(whiteList[msg.sender].isRegistered, "User is not registred has a voter !");
+        require(!whiteList[msg.sender].hasVoted, "Voter has already voted");
+
+        listProposals[idProposal].voteCount++;
+        whiteList[msg.sender].hasVoted = true;
+        whiteList[msg.sender].votedProposalId = idProposal;
+
+        emit Voted(msg.sender, idProposal);
+    }
+
+    function VotingSessionEnd() external onlyOwner {
+        require(workflowState == WorkflowStatus.VotingSessionStarted, "Error with the WorkflowStatus");
+
+        WorkflowStatus oldState = workflowState;
+        workflowState = WorkflowStatus.VotingSessionEnded;
+ 
+        emit WorkflowStatusChange(oldState, workflowState);
+        emit VotingSessionEnded();
+    }
+
+    function countVotes() external onlyOwner{
+        require(workflowState == WorkflowStatus.VotingSessionEnded, "Error with the WorkflowStatus");
+
+        uint maxVotesProposal = 0;
+        for(uint i = 1; i <= proposalCounts.current(); i++ )
+        {
+            if(listProposals[i].voteCount > maxVotesProposal)
+            {
+                maxVotesProposal = listProposals[i].voteCount;
+                winningProposalId = i;
+            }
+        }
+
+        WorkflowStatus oldState = workflowState;
+        workflowState = WorkflowStatus.VotesTallied;
+
+        emit WorkflowStatusChange(oldState, workflowState);
+        emit VotesTallied();
+    }
+
+    function getWinningProposal() external view returns(string memory) {
+        require(workflowState == WorkflowStatus.VotingSessionEnded, "Error with the WorkflowStatus");
+
+        return listProposals[winningProposalId].description;
     }
 }

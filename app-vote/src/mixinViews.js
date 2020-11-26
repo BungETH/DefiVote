@@ -98,7 +98,7 @@ export default {
          */
         blockchainIsConnected() {
             this.bcConnected = ((window.bc != undefined) && window.bc.isConnected());
-
+            console.debug(this.bcConnected);
             return this.bcConnected;
         },
 

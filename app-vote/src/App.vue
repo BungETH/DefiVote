@@ -1,10 +1,12 @@
 <template>
   <div id="app">
     <img src="./assets/logo.png">
-    <router-view/>
+    <div>
+        <Menu></Menu>
+    </div>
 
-        <div class="p-4" v-show="bcConnected && !bcConnectionError">
-            <h2>CONNECTED !!</h2>
+        <!-- <div class="p-4" v-show="bcConnected && !bcConnectionError">
+            <h3>CONNECTED</h3>
         </div>
         <div v-show="bcConnectionError" class="m-4 alert alert-danger">
             <h2 class="pb-4">Error connecting to the blockchain!</h2>
@@ -25,7 +27,7 @@
                 <li>The port in your settings (file: <b>libs/mixinViews.js</b>) match with the blockchain configuration.</li>
                 <li>The compiled smart contract <b>app-users/src/assets/Voting.json</b> is equal to <b>build/Voting.json</b>.</li>
             </ul>
-        </div>
+        </div> -->
 
 
   </div>
@@ -33,11 +35,11 @@
 
 <script>
 
-import mixin from './mixinViews.js';
+import Menu from './components/Menu';
 
 export default {
   name: 'App',
-  mixins: [mixin]
+  components: { Menu },
 }
 </script>
 

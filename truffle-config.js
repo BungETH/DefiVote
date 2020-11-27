@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
   // See http://truffleframework.com/docs/advanced/configuration
   // to customize your Truffle configuration!
-  contracts_build_directory: path.join(__dirname, "app-vote/src/assets/contracts"),
+  contracts_build_directory: path.join(__dirname, "vue-client/src/util/contracts"),
   networks: {
     develop: {
       host: "localhost",
